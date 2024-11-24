@@ -1,5 +1,5 @@
 from aiohttp import web
-from plugins import web_server, join_requests
+from plugins import web_server, req_accept
 
 import pyromod.listen
 import pyrogram
