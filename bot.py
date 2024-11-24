@@ -1,7 +1,7 @@
 #(©)NextGenBotz
 
 from aiohttp import web
-from plugins import web_server
+from plugins import web_server, join_requests
 
 import pyromod.listen
 import pyrogram
