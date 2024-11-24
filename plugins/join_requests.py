@@ -1,7 +1,7 @@
 from pyrogram import Client
 from pyrogram.types import ChatJoinRequest
 
-# MongoDB Integration - Adjust as per your database setup
+# MongoDB Integration
 from config import Data
 
 ACCEPTED_TEXT = "Hi {user}, welcome to {chat}! You can now access the files here."
@@ -12,7 +12,8 @@ async def req_accept(c: Client, m: ChatJoinRequest):
     chat_id = m.chat.id
 
     # Check if user is already in the database
-    if not await Data.find_one({'id': user_id}): 
+    user_exists = await Data.find_one({'id': user_id})
+    if not user_exists: 
         await Data.insert_one({'id': user_id})
 
     # Approve the join request
@@ -26,4 +27,3 @@ async def req_accept(c: Client, m: ChatJoinRequest):
         )
     except Exception as e:
         print(f"Error sending message to {user_id}: {e}")
-      
