@@ -14,7 +14,7 @@ APP_ID = int(os.environ.get("APP_ID", "29414758"))
 API_HASH = os.environ.get("API_HASH", "8cd9e6113ed53dd8767cb760d4535bd1")
 
 # Your db channel Id
-CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002488304483"))
+CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002488304483 -1002441075070"))
 
 # OWNER ID
 OWNER_ID = int(os.environ.get("OWNER_ID", "6174868004"))
@@ -57,7 +57,7 @@ CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", "This video/Photo/anything is 
 #PROTECT_CONTENT = True if os.environ.get('PROTECT_CONTENT', "False") == "False" else False
 
 # Set true if you want Disable your Channel Posts Share button
-DISABLE_CHANNEL_BUTTON = os.environ.get("DISABLE_CHANNEL_BUTTON", None) == 'True'
+DISABLE_CHANNEL_BUTTON = os.environ.get("DISABLE_CHANNEL_BUTTON", True) == 'True'
 
 BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
 USER_REPLY_TEXT = "❌Don't send me messages directly I'm only File Share bot!"
