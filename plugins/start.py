@@ -24,7 +24,7 @@ from config import (
     # SHORTLINK_API,  # Commented for shortlink
     # SHORTLINK_URL,  # Commented for shortlink
     DISABLE_CHANNEL_BUTTON,
-    PROTECT_CONTENT,
+   # PROTECT_CONTENT,
     TUT_VID,
     OWNER_ID,
 )
@@ -124,7 +124,7 @@ async def start_command(client: Client, message: Message):
                     caption=caption,
                     parse_mode=ParseMode.HTML,
                     reply_markup=reply_markup,
-                    protect_content=PROTECT_CONTENT
+                    # protect_content=PROTECT_CONTENT  # Commented out this line
                 )
                 codeflix_msgs.append(copied_msg)
             except FloodWait as e:
@@ -134,7 +134,7 @@ async def start_command(client: Client, message: Message):
                     caption=caption,
                     parse_mode=ParseMode.HTML,
                     reply_markup=reply_markup,
-                    protect_content=PROTECT_CONTENT
+                    # protect_content=PROTECT_CONTENT  # Commented out this line
                 )
                 codeflix_msgs.append(copied_msg)
             except Exception as e:
