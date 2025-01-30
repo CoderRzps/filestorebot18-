@@ -1,5 +1,6 @@
 from aiohttp import web
 from plugins import web_server
+import asyncio  # Missing import
 
 import pyromod.listen
 import pyrogram
