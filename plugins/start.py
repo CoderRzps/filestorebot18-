@@ -41,23 +41,22 @@ from helper_func import (
 from database.database import add_user, del_user, full_userbase, present_user
 # from shortzy import Shortzy  # Commented for shortlink
 
-
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
     id = message.from_user.id
-    owner_ids = ADMINS  # Agar ADMINS list hai, to use karein
+    owner_ids = ADMINS  # Agar ADMINS ek list ya tuple hai
 
     text = message.text  # message.text ko variable me store karein
 
-    if id in owner_ids:  # Agar owner hai
-        await message.reply("You are the owner! Additional actions can be added here.")
-        return
+    if id in owner_ids:  # ✅ Owner ke liye bhi same code chalega
+        await message.reply("You are the owner! Fetching your files...")
 
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
+    else:
+        if not await present_user(id):
+            try:
+                await add_user(id)
+            except Exception as e:
+                print(f"Error adding user: {e}")
 
     # Commented-out verification section
     # verify_status = await get_verify_status(id)
@@ -157,6 +156,7 @@ async def start_command(client: Client, message: Message):
             disable_web_page_preview=True,
             quote=True
         )
+
 
         # Commented out verify link section for token check
         # else:
