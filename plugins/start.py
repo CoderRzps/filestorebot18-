@@ -45,43 +45,29 @@ from database.database import add_user, del_user, full_userbase, present_user
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
     id = message.from_user.id
-    owner_id = ADMINS  # Fetch the owner's ID from config
+    owner_ids = ADMINS  # Agar ADMINS list hai, to use karein
 
-    # Check if the user is the owner
-    if id == owner_id:
-        # Owner-specific actions
-        # You can add any additional actions specific to the owner here
+    text = message.text  # message.text ko variable me store karein
+
+    if id in owner_ids:  # Agar owner hai
         await message.reply("You are the owner! Additional actions can be added here.")
+        return
 
-    else:
-        if not await present_user(id):
-            try:
-                await add_user(id)
-            except:
-                pass
+    if not await present_user(id):
+        try:
+            await add_user(id)
+        except Exception as e:
+            print(f"Error adding user: {e}")
 
-        # Commenting out verification section
-        # verify_status = await get_verify_status(id)
-        # if verify_status['is_verified'] and VERIFY_EXPIRE < (time.time() - verify_status['verified_time']):
-        #     await update_verify_status(id, is_verified=False)
-
-        # if "verify_" in message.text:
-        #     _, token = message.text.split("_", 1)
-        #     if verify_status['verify_token'] != token:
-        #         return await message.reply("Your token is invalid or Expired.🥲  Try again by clicking /start")
-        #     await update_verify_status(id, is_verified=True, verified_time=time.time())
-        #     if verify_status["link"] == "":
-        #         reply_markup = None
-        #     await message.reply(f"Your token successfully verified and valid for: 24 Hour 😀", reply_markup=reply_markup, protect_content=False, quote=True)
-
-        if len(text) > 7:
+    # Decode Base64 argument if available
+    if len(text) > 7:
         try:
             base64_string = text.split(" ", 1)[1]
-        except IndexError:
+            decoded_string = await decode(base64_string)  # Agar decode async hai
+            argument = decoded_string.split("-")
+        except (IndexError, Exception) as e:
+            print(f"Error decoding Base64: {e}")
             return
-
-        string = await decode(base64_string)
-        argument = string.split("-")
 
         ids = []
         if len(argument) == 3:
@@ -112,43 +98,52 @@ async def start_command(client: Client, message: Message):
 
         codeflix_msgs = []
         for msg in messages:
-            caption = (CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, 
-                                             filename=msg.document.file_name) if bool(CUSTOM_CAPTION) and bool(msg.document)
-                       else ("" if not msg.caption else msg.caption.html))
+            caption = (CUSTOM_CAPTION.format(previouscaption=msg.caption.html if msg.caption else "",
+                                             filename=msg.document.file_name) if CUSTOM_CAPTION and msg.document
+                       else (msg.caption.html if msg.caption else ""))
 
-            reply_markup = msg.reply_markup if DISABLE_CHANNEL_BUTTON else None
+            reply_markup = msg.reply_markup if not DISABLE_CHANNEL_BUTTON else None
 
             try:
-                copied_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, 
-                                            reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                copied_msg = await msg.copy(
+                    chat_id=message.from_user.id,
+                    caption=caption,
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=reply_markup,
+                    protect_content=PROTECT_CONTENT
+                )
                 codeflix_msgs.append(copied_msg)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
-                copied_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, 
-                                            reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                copied_msg = await msg.copy(
+                    chat_id=message.from_user.id,
+                    caption=caption,
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=reply_markup,
+                    protect_content=PROTECT_CONTENT
+                )
                 codeflix_msgs.append(copied_msg)
             except Exception as e:
                 print(f"Failed to send message: {e}")
-                pass
 
-        # elif verify_status['is_verified']:  # Commented out conditional for verified check
-        else:
-            reply_markup = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("About Me", callback_data="about"),
-                  InlineKeyboardButton("Close", callback_data="close")]]
-            )
-            await message.reply_text(
-                text=START_MSG.format(
-                    first=message.from_user.first_name,
-                    last=message.from_user.last_name,
-                    username=None if not message.from_user.username else '@' + message.from_user.username,
-                    mention=message.from_user.mention,
-                    id=message.from_user.id
-                ),
-                reply_markup=reply_markup,
-                disable_web_page_preview=True,
-                quote=True
-            )
+    else:
+        reply_markup = InlineKeyboardMarkup([
+            [InlineKeyboardButton("About Me", callback_data="about"),
+             InlineKeyboardButton("Close", callback_data="close")]
+        ])
+        await message.reply_text(
+            text=START_MSG.format(
+                first=message.from_user.first_name,
+                last=message.from_user.last_name,
+                username=f'@{message.from_user.username}' if message.from_user.username else None,
+                mention=message.from_user.mention,
+                id=message.from_user.id
+            ),
+            reply_markup=reply_markup,
+            disable_web_page_preview=True,
+            quote=True
+        )
+
 
         # Commented out verify link section for token check
         # else:
